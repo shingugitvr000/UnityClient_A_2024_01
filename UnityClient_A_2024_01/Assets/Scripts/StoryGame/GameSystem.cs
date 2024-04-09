@@ -66,7 +66,8 @@ namespace STORYGAME //이름 충돌 방지
         public StoryTableObject[] storyModels;          //기존에 있던것 모델들 소스코드 위치 이동
         public StoryTableObject currentModels;          //현재 스토리 모델 객체
         public int currentStoryIndex;                   //스토리 모델 인덱스
-
+        public bool showStroy = false;
+      
         private void Awake()
         {
             instance = this;
@@ -77,9 +78,48 @@ namespace STORYGAME //이름 충돌 방지
             StartCoroutine(ShowText());         //텍스트를 보여준다.
         }
 
+        public void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Q)) StoryShow(1);              //Q 키를 누르면 1번 스토리 
+            if (Input.GetKeyDown(KeyCode.W)) StoryShow(2);              //W 키를 누르면 2번 스토리 
+            if (Input.GetKeyDown(KeyCode.E)) StoryShow(3);              //E 키를 누르면 3번 스토리
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                delay = 0.0f;               
+            }
+        }
+
+        public void StoryShow(int number)
+        {
+            if(!showStroy)
+            {
+                currentModels = FindStoryModel(number);                 //스토리 모델을 번호로 찾아서
+                delay = 0.1f;
+                StartCoroutine(ShowText());                             //루틴을 실행 시킨다.
+            }
+        
+        }
+
+        StoryTableObject FindStoryModel(int number)                 //스토리 모델 번호로 찾는 함수
+        {
+            StoryTableObject tempStoryModels = null;                //temp 미리 저장 해놓을 변수를 선언
+            for(int i = 0;  i < storyModels.Length; i++)            //버튼으로 받아온 리스트를 for문으로 검사하여
+            {
+                if (storyModels[i].storyNumber == number)           //숫자가 같은 경우
+                {
+                    tempStoryModels = storyModels[i];               //미리 선언해 놓은 변수에 넣고
+                    break;                                          //for 문을 빠저 나온다.
+                }
+            }
+
+            return tempStoryModels;                                 //스토리 모델을 돌려준다.
+        }
+
         IEnumerator ShowText()
         {
-            for(int i = 0; i <= currentModels.storyText.Length; i++)
+            showStroy = true;
+            for (int i = 0; i <= currentModels.storyText.Length; i++)
             {
                 currentText = currentModels.storyText.Substring(0, i);
                 textComponent.text = currentText;
@@ -87,6 +127,7 @@ namespace STORYGAME //이름 충돌 방지
             }
 
             yield return new WaitForSeconds(delay);
+            showStroy = false;
         }
 
 #if UNITY_EDITOR
